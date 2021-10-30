@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입 화면</title>
+</head>
+<body>
+    <div>
+        <input type="text" id="idValue" placeholder="아이디 입력" >
+        <input type="text" id="pwValue" placeholder="비밀번호 입력" >
+        <input type="text" id="nameValue" placeholder="이름" >
+        <input type="text" id="contactValue" placeholder="연락처" >
+        <!--<input type="text" id="addressValue" placeholder="거주지(시군구)" >-->
+        <select id="addressValue" placeholder="거주지(시군구)">
+            <option value="incheon">인천</option>
+            <option value="Seoul">서울</option>
+            <option value="Gyunggi">경기</option>
+            <option value="etc">그 외 지역</option>
+        </select>
+        <input type="button" value="회원가입입력" onclick="signUpEvent()" >
+    </div>
+</body>
+<script>
+    function signUpEvent() {
+        const id = document.getElementById("idValue").value;
+        const pw = document.getElementById("pwValue").value;
+        const name = document.getElementById("nameValue").value;
+        const contact = document.getElementById("contactValue").value;
+        const address = document.getElementById("addressValue").value;
+
+        fetch("/signUp", {
+            "method" : "POST", //새로운 값을 디비에 수정하니까,,
+            "headers" : {
+                "Content-Type" : "application/json" 
+            },
+            "body": JSON.stringify ({
+                "id": id,
+                "pw": pw,
+                "name": name,
+                "contact": contact,
+                "address": address
+            }) 
+        })  
+        .then(response => response.json()) 
+        .then(result => {
+            console.log(result) //콘솔에 안찍힘 
+            if (result.success == true) {
+                alert("회원 가입 성공, 메인 페이지로 돌아갑니다.");
+                location.href = "./main"
+            } else {
+                alert ("중복된 아이디가 있습니다, 다시 시도하세요"); 
+                location.href = "./join"
+            }
+        })
+    }
+</script>
+</html>

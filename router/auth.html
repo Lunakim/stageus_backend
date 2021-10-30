@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>week4 Auth</title>
+</head>
+<body>
+    <script>
+        window.onload = () => {
+            if (localStorage.getItem("token")) {
+                fetch("/token/verify", {
+                "method" : "POST",  
+                "headers" : {
+                    "auth" : localStorage.getItem("token")
+                },
+                })
+                .then(response => response.json()) 
+                .then(result => {
+                    if (result.success) {
+                        alert(result.message)
+                    } else {
+                        alert(result.message)
+                        localStorage.removeItem("token")
+                    }
+                })
+            }
+        }
+    </script>
+    <input type="text" id="myId" >
+    <input type="text" id="myPw" >
+    <input type="button" id="login" onclick="login()">
+
+    <script>
+        const login = () => {
+            const recvId = document.getElementById("myId").value;
+            const recvPw = document.getElementById("myPw").value;
+
+            fetch("/token", {
+                "method" : "POST",  
+                "headers" : {
+                    "Content-Type" : "application/json" 
+                },
+                "body": JSON.stringify ({
+                    "id": recvId,
+                    "pw": recvPw
+                }) 
+            })
+            .then(response => response.json()) 
+            .then(result => {
+                if (result.success) {
+                    //토큰 저장, 웹 스토리지에 
+                    localStorage.setItem("token", result.token);
+                } else {
+                    alert("로그인 실패")
+                }
+            })
+        }
+        
+    </script>
+</body>
+</html>

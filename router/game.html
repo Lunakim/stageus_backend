@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>game</title>
+</head>
+<body>
+    <script>
+        window.onload =() => {
+            fetch("/gameFunction/setting", {
+                "method": "POST",
+                "headers" : {
+                    "Content-Type" : "application/json"
+                }, 
+                "body": JSON.stringify ({
+                    "key": "pikachu"
+                })
+            })
+            .then(res => res.json())
+            .then(result => {
+                document.getElementById("gold").innerHTML = result.gold
+                document.getElementById("exp").innerHTML = result.exp
+                document.getElementById("power").innerHTML = result.power
+                document.getElementById("level").innerHTML = result.level
+            })
+            //redis에 없을 경우 디비에서 가져오기 
+        }
+    </script>
+    <h1>개발자 키우기</h1>
+    <table id="conditionBar">
+        <tr>
+            <th>LEVEL</th>
+            <th>EXP</th>
+            <th>POWER</th>
+            <th>GOLD</th>
+        </tr>
+        <tr>
+            <td id="level">0</td>
+            <td id="exp">0</td>
+            <td id="power">0</td>
+            <td id="gold">0</td>
+        </tr>
+    </table>
+    <div id="fuctionBar">
+        <input type="button" value="ATTACK" id="attack" onclick="attackEvent()">
+        <input type="button" value="SHOP" id="shop" onclick="shopEvent()">
+        <input type="button" value="PET" id="petChange" onclick="petChangeEvent()">
+    </div>
+</body>
+<script>
+    const attackEvent = () => {
+        fetch("/gameFunction/attack", {
+            "method": "POST",
+            "headers" : {
+                "Content-Type" : "application/json"
+            },
+            "body" : JSON.stringify ({
+                "key": "pikachu"
+            })
+        })
+        .then(response => response.json())
+        .then((result) => {
+            document.getElementById("gold").innerHTML = result.gold
+            document.getElementById("exp").innerHTML = result.exp
+            document.getElementById("level").innerHTML = parseInt(document.getElementById("level").innerText) + result.levelChange
+        })
+    }
+
+
+    const shopEvent = () => {
+        if(parseInt(document.getElementById("gold").innerText)< 10) {
+            alert("아이템 구입은 골드 10부터 가능, 돈을 벌어오세요")
+        } else {
+            fetch("/gameFunction/shop", {
+            "method": "POST",
+            "headers" : {
+                "Content-Type" : "application/json"
+            },
+            "body" : JSON.stringify ({
+                "key": "pikachu"
+            })
+            })
+            .then(response => response.json())
+            .then((result) => {
+                if (result.success == true) {
+                    document.getElementById("power").innerHTML = result.power
+                    document.getElementById("gold").innerHTML = result.gold
+                } else {
+                    alert("redis에 문제가 있습니다.")
+                }
+            })
+        }
+    }
+
+
+    function petChangeEvent() {
+        alert("아직 구현 중")
+    }
+
+    
+
+ 
+
+    
+</script>
+</html>

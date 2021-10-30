@@ -1,0 +1,128 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1주차 웹서버 구축</title>
+</head>
+<body>
+    <div>
+        <input type="button" value="회원가입" onclick="joinEvent()">
+    </div>
+    <div id ="logInForm" style="display: block;">
+        <input type="text" id="idValue" >
+        <input type="text" id="pwValue" >
+        <input type="button" value="로그인" onclick="loginEvent()">
+        <input type="button" value="네이버 아이디로 로그인" onclick="naverLoginEvent()">
+        <h1>hello...</h1>
+    </div>
+    <div>
+        <input type="button" value="증가" onclick="addNum()">
+        <input type="button" value="감소" onclick="subNum()">
+        <div id="resultBox"></div>
+    </div>
+    <script>
+        const addNum =() => {
+            fetch("/numberSet/increase", {
+                "method" : "POST", 
+                "headers" : {
+                    "Content-Type" : "application/json" 
+                },
+                "body": JSON.stringify ({
+                    "key": "number"
+                }) 
+            })  
+            .then(response => response.json()) 
+            .then((result) => {
+                document.getElementById("resultBox").innerHTML = result.resultNum;
+            })
+        }
+
+        const subNum =() => {
+            // fetch("/numberSet/decrease", {
+            //     "method" : "POST", 
+            //     "headers" : {
+            //         "Content-Type" : "application/json" 
+            //     },
+            //     "body": JSON.stringify ({
+
+            //     }) 
+            // })  
+            // .then(response => response.json()) 
+            // .then((result) => {
+                
+            // })
+        }
+    </script>
+
+    
+</body>
+<script>
+    window.onload = () => {
+        if (localStorage.getItem("token")) {
+            fetch("/token/verify", {
+            "method" : "POST",  
+            "headers" : {
+                "auth" : localStorage.getItem("token")
+            },
+            })
+            .then(response => response.json()) 
+            .then(result => {
+                if (result.success) {
+                    //alert(result.message)
+                } else {
+                    //alert(result.message)
+                    localStorage.removeItem("token")
+                }
+            })
+
+        }
+    }
+    
+    function loginEvent() {
+        const id = document.getElementById("idValue").value;
+        const pw = document.getElementById("pwValue").value;
+        
+        fetch("/token", {
+            "method" : "POST", 
+            "headers" : {
+                "Content-Type" : "application/json" 
+            },
+            "body": JSON.stringify ({
+                "id": id,
+                "pw": pw
+            }) 
+        })  
+        .then(response => response.json()) 
+        .then(result => {
+            if (result.success) {
+                alert(result.message);
+                localStorage.setItem("token", result.token);
+                location.href ='./index2'
+            } else if (result.message == "비밀번호가 틀렸음") {
+                alert(result.message)
+                location.href ='./main'
+            } else {
+                alert(result.message);
+                location.href = './main'
+            }
+        })
+    }
+
+    function joinEvent() {
+        location.href="./join" //fetch를 이용하는 방법도 있음
+    };
+
+    function naverLoginEvent() {
+        location.href="./naverLogin/naverlogin"
+        // fetch("./naverLogin/naverlogin", {
+        //     "method" : "POST", 
+        //     "headers" : {
+        //         "Content-Type" : "application/json" 
+        //     },
+        // })
+    };
+
+</script>
+</html>

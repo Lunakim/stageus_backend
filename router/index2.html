@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 후에...</title>
+</head>
+<body>
+    <script>
+        window.onload = () => {
+            //여기는 토큰이 있을때만 넘어옴. 넘어온거 받아서 issuer가 stageus, naver(serviceprovider)인지 구분해서 
+            //네이버 발급이면 localstorage.setItem 먼저 해 //verify를 뒤집어야되네 
+            //네이버는 
+            if (localStorage.getItem("token")) {
+                alert("토큰이 있습니다.")
+                fetch("/token/verify", {
+                    "method" : "POST",  
+                    "headers" : {
+                         "auth" : localStorage.getItem("token")
+                    }
+                })
+                .then(response => response.json()) 
+                .then(result => {
+                    if (result.success) {
+                        alert(result.message)
+                    } else {
+                        alert(result.message)
+                        localStorage.removeItem("token")
+                    }
+                })
+            }
+        }
+    </script>
+    <input type="button" value="내 정보 보기" onclick="showTokenEvent()">
+    <input type="button" value="로그아웃" id = "logOutBtn" onclick="logOutEvent()">
+    <input type="button" value="게임하기" id = "gameBtn" onclick="gameEvent()"
+</body>
+<script>
+    function showTokenEvent() {
+        fetch("../token/showInfo", {
+            "method" : "POST",  
+            "headers" : {
+                "auth" : localStorage.getItem("token")
+            },
+            })
+            .then(response => response.json()) 
+            .then(result => {
+                const id= document.createElement("div")
+                const name= document.createElement("div")
+                const phone= document.createElement("div")
+                name.textContent = result.name
+                id.textContent = result.id
+                phone.textContent = result.contact
+                const userInfo = document.getElementById("userInfo")
+                userInfo.appendChild(id)
+                userInfo.appendChild(name)
+                userInfo.appendChild(phone)       
+            })
+    }
+
+    function gameEvent() {
+        location.href = "./game"
+    }
+</script>
+</html>
